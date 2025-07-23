@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🧠 Ecom Data Agent</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #e3f2fd, #fff3e0);
+      min-height: 100vh;
+      padding-top: 50px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container {
+      max-width: 900px;
+    }
+
+    .result-section {
+      margin-top: 40px;
+    }
+
+    .card {
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .chart-img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .form-control:focus {
+      border-color: #0288d1;
+      box-shadow: 0 0 0 0.2rem rgba(2, 136, 209, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container text-center">
+    <h1 class="mb-4 display-5 fw-bold text-primary">🧠 E-Commerce Data Assistant</h1>
+
+    <div class="card p-4">
+      <label for="question" class="form-label fs-5 fw-semibold">Ask a question:</label>
+      <input type="text" class="form-control form-control-lg mb-3" id="question" placeholder="e.g., What is my total sales?">
+      <button class="btn btn-primary btn-lg" onclick="askQuestion()">Ask</button>
+    </div>
+
+    <div class="result-section">
+      <div id="chartContainer" class="my-4 text-center" style="display:none;">
+        <h3 class="mb-3 text-success">📊 Chart</h3>
+        <img id="chartImage" class="chart-img" />
+      </div>
+
+      <div id="sqlBox" class="alert alert-info mt-4" style="display:none;">
+        <strong>🧾 SQL Generated:</strong>
+        <div id="sqlText" class="mt-2"></div>
+      </div>
+
+      <div id="resultBox" class="alert alert-secondary mt-3" style="display:none;">
+        <strong>📦 Query Result:</strong>
+        <pre id="resultText" class="mt-2 text-start"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function askQuestion() {
+      const question = document.getElementById("question").value.trim();
+      if (!question) return alert("Please enter a question.");
+
+      const res = await fetch("http://localhost:8000/ask", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ question })
+      });
+
+      const data = await res.json();
+
+      // Reset view
+      document.getElementById("chartContainer").style.display = "none";
+      document.getElementById("sqlBox").style.display = "none";
+      document.getElementById("resultBox").style.display = "none";
+
+      if (data.chart) {
+        document.getElementById("chartImage").src = `data:image/png;base64,${data.chart}`;
+        document.getElementById("chartContainer").style.display = "block";
+      }
+
+      if (data.sql) {
+        document.getElementById("sqlText").innerText = data.sql;
+        document.getElementById("sqlBox").style.display = "block";
+      }
+
+      if (data.result) {
+        const resultJSON = typeof data.result === 'string' ? data.result : JSON.stringify(data.result, null, 2);
+        document.getElementById("resultText").innerText = resultJSON;
+        document.getElementById("resultBox").style.display = "block";
+      }
+
+      if (data.error) {
+        document.getElementById("resultText").innerText = `❌ ${data.error}`;
+        document.getElementById("resultBox").className = "alert alert-danger mt-3";
+        document.getElementById("resultBox").style.display = "block";
+      }
+    }
+  </script>
+
+</body>
+</html>

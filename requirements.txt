@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+requests
+pandas
+matplotlib
+sqlite3  # no need to install manually, Python built-in
