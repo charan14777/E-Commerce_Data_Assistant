@@ -1,7 +1,6 @@
 📌 Project Overview
 This project builds a local AI-powered agent that can answer natural language questions based on provided e-commerce datasets. It uses a local Large Language Model (LLM) to translate user queries into SQL, retrieve answers from a structured database, and respond via API. Optional features include data visualization and real-time streaming responses.
 
-
 🗂️ Dataset Description
 You will work with the following three structured CSV datasets:
 
